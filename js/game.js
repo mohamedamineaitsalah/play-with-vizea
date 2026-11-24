@@ -136,7 +136,7 @@
     x = Math.min(hi, Math.max(lo, x));
     return {
       x, baseX: x, y, r, kind, amp, ph: Math.random() * 6.28, ms: rand(0.9, 1.5) * (1 + d),
-      w: (4.4 + 1.6 * d) * rand(0.92, 1.08) * (Math.random() < 0.5 ? -1 : 1),
+      w: (3.4 + 2.6 * d) * rand(0.92, 1.08) * (Math.random() < 0.5 ? -1 : 1),
       pulse: 0, life: 1, lifeMax: rand(2.4, 1.6) - d * 0.4, broken: false, idx,
     };
   }
@@ -146,7 +146,7 @@
   function reset() {
     S.circles = []; S.parts = []; S.floats = []; S.rings = [];
     S.score = 0; S.jumps = 0; S.combo = 0; S.bestCombo = 0; S.milestone = 0; S.lives = MAX_LIVES; S.maxCi = 0;
-    S.circles.push({ x: colW / 2, baseX: colW / 2, y: 0, r: colW * 0.15, kind: "normal", amp: 0, ph: 0, ms: 0, w: 4.4, pulse: 0, life: 1, lifeMax: 2, broken: false, idx: 0 });
+    S.circles.push({ x: colW / 2, baseX: colW / 2, y: 0, r: colW * 0.15, kind: "normal", amp: 0, ph: 0, ms: 0, w: 3.4, pulse: 0, life: 1, lifeMax: 2, broken: false, idx: 0 });
     Object.assign(S.ball, { state: "orbit", ci: 0, a: -Math.PI * 0.15, trail: [], fall: 0, lap: 0, lapA: -Math.PI * 0.15, bounced: false });
     ensureCircles();
     S.camY = S.circles[0].y - H * 0.64;
