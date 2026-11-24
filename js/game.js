@@ -135,7 +135,7 @@
     x = Math.min(hi, Math.max(lo, x));
     return {
       x, baseX: x, y, r, kind, amp, ph: Math.random() * 6.28, ms: rand(0.9, 1.5) * (1 + d),
-      w: (2.0 + 2.4 * d) * rand(0.92, 1.08) * (Math.random() < 0.5 ? -1 : 1),
+      w: (2.4 + 2.4 * d) * rand(0.92, 1.08) * (Math.random() < 0.5 ? -1 : 1),
       pulse: 0, life: 1, lifeMax: rand(2.4, 1.6) - d * 0.4, broken: false, idx,
     };
   }
@@ -145,7 +145,7 @@
   function reset() {
     S.circles = []; S.parts = []; S.floats = []; S.rings = [];
     S.score = 0; S.jumps = 0; S.combo = 0; S.bestCombo = 0; S.milestone = 0; S.lives = MAX_LIVES; S.maxCi = 0;
-    S.circles.push({ x: colW / 2, baseX: colW / 2, y: 0, r: colW * 0.15, kind: "normal", amp: 0, ph: 0, ms: 0, w: 2.0, pulse: 0, life: 1, lifeMax: 2, broken: false, idx: 0 });
+    S.circles.push({ x: colW / 2, baseX: colW / 2, y: 0, r: colW * 0.15, kind: "normal", amp: 0, ph: 0, ms: 0, w: 2.4, pulse: 0, life: 1, lifeMax: 2, broken: false, idx: 0 });
     Object.assign(S.ball, { state: "orbit", ci: 0, a: -Math.PI * 0.15, trail: [], fall: 0, lap: 0, lapA: -Math.PI * 0.15, bounced: false });
     ensureCircles();
     S.camY = S.circles[0].y - H * 0.64;
@@ -196,7 +196,7 @@
     if (S.mode !== "play" || S.ball.state !== "orbit") return;
     const c = S.circles[S.ball.ci], s = Math.sign(c.w);
     const tx = -Math.sin(S.ball.a) * s, ty = Math.cos(S.ball.a) * s;
-    const sp = colW * 1.55 * (1 + diff() * 0.25);
+    const sp = colW * 1.35 * (1 + diff() * 0.15);
     Object.assign(S.ball, { state: "fly", vx: tx * sp, vy: ty * sp, p0x: S.ball.x, p0y: S.ball.y, sq: 1, from: S.ball.ci, bounced: false });
     S.flyT = 0; S.tickI = -1;
     A.play("jump");
