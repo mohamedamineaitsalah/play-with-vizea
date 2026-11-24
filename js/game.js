@@ -217,10 +217,12 @@
     if (good) { S.combo = Math.min(MAX_COMBO, S.combo + 1); comboPop(t("comboPop", { n: S.combo })); }
     else { if (S.combo > 1) comboPop(t("comboLost"), true); S.combo = 0; }
     S.bestCombo = Math.max(S.bestCombo, S.combo);
-    let pts = 20 * Math.max(1, S.combo) * n;
+    // sauter un cercle ne multiplie pas les points : même valeur qu'un saut normal (x8 = 160)
+    let pts = n > 0 ? 20 * Math.max(1, S.combo) : 0;
     const center = good && dc < 0.13;
     if (center) pts += 20;
     if (b.bounced && pts > 0) pts *= 2;
+    pts = Math.min(pts, 360); // maximum absolu par saut : 360 points
     S.score += pts; S.jumps += n;
     b.a = Math.atan2(b.y - c.y, b.x - c.x);
     const s = Math.sign(-Math.sin(b.a) * b.vx + Math.cos(b.a) * b.vy) || 1;
