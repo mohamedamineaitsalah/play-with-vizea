@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <meta name="theme-color" content="#0e0f10" />
+  <title>PLAY WITH VIZEA</title>
+  <meta name="description" content="PLAY WITH VIZEA — le jeu marketing, pub et créativité de ViZea." />
+  <link rel="icon" type="image/png" href="assets/img/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="app" class="is-home">
+    <canvas id="game" aria-hidden="true"></canvas>
+    <canvas id="fx" aria-hidden="true"></canvas>
+    <div class="flash" id="flash"></div>
+
+    <!-- ===== TOP BAR ===== -->
+    <header class="topbar">
+      <div class="brand">
+        <img src="assets/img/favicon.png" alt="" class="brand-ico" />
+        <span class="brand-txt">PLAY WITH <b>VIZEA</b></span>
+      </div>
+      <a href="../../index.html#games" class="icon-btn back-link" title="Plus de jeux ViZea"><span class="back-arr">←</span><span class="lbl-b">JEUX VIZEA</span></a>
+      <div class="controls">
+        <button class="icon-btn" id="btn-music" aria-label="Musique ON/OFF" title="Musique (M)">
+          <svg viewBox="0 0 24 24" class="ico-on"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+          <svg viewBox="0 0 24 24" class="ico-off"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/><path d="M3 3l18 18" class="slash"/></svg>
+          <span class="lbl">MUSIQUE</span>
+        </button>
+        <button class="icon-btn" id="btn-sfx" aria-label="Sons ON/OFF" title="Effets sonores (S)">
+          <svg viewBox="0 0 24 24" class="ico-on"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 010 7M19 5a10 10 0 010 14"/></svg>
+          <svg viewBox="0 0 24 24" class="ico-off"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M22 9l-6 6M16 9l6 6"/></svg>
+          <span class="lbl">SONS</span>
+        </button>
+        <button class="icon-btn only-play" id="btn-pause" aria-label="Pause" title="Pause (P)">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- ===== HUD ===== -->
+    <section class="hud" id="hud" aria-live="polite">
+      <div class="hud-cell hud-score">
+        <span class="hud-k">SCORE</span>
+        <span class="hud-v" id="hud-score">0</span>
+        <span class="hud-sub">RECORD <b id="hud-best">0</b></span>
+      </div>
+      <div class="hud-cell hud-goal">
+        <div class="hud-level"><span id="hud-lvl">NIV 1</span><span class="dot"></span><span id="hud-lvlname">Identité Visuelle</span></div>
+        <div class="progress"><i id="hud-progress"></i></div>
+        <div class="hud-sub"><b id="hud-goal">0 / 0</b> pts objectif</div>
+      </div>
+      <div class="hud-cell hud-right">
+        <div class="hud-time" id="hud-time">60</div>
+        <div class="lives" id="hud-lives"></div>
+      </div>
+      <div class="powerups" id="powerups"></div>
+    </section>
+    <div class="combo" id="combo"><span id="combo-v">x2</span><small>COMBO</small></div>
+    <div class="toast" id="toast"></div>
+    <div class="countdown" id="countdown"></div>
+
+    <!-- ===== HOME ===== -->
+    <section class="screen" id="screen-home">
+      <div class="home-wrap">
+        <div class="eyebrow"><span class="pulse-dot"></span> Marketing · Pub · Créativité</div>
+        <h1 class="home-title">
+          <span class="play-with">PLAY WITH</span>
+          <img src="assets/img/logo-vizea.png" alt="ViZea" class="home-logo" />
+        </h1>
+        <p class="home-tag">Attrape les bonnes idées, esquive les bad buzz et mène <b>5 campagnes</b> jusqu'au succès viral.</p>
+        <button class="btn-play" id="btn-play">
+          <span class="btn-play-txt">PLAY</span>
+          <span class="btn-play-arrow"><svg viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></svg></span>
+        </button>
+        <div class="home-meta">
+          <div class="record-chip"><span>🏆</span> RECORD <b id="home-best">0</b></div>
+          <button class="link-btn" id="btn-howto">Comment jouer ?</button>
+        </div>
+      </div>
+      <div class="marquee" aria-hidden="true">
+        <div class="marquee-track">
+          <span>Identité Visuelle</span><i>✦</i><span>Réseaux Sociaux</span><i>✦</i><span>Publicité &amp; Stratégie</span><i>✦</i><span>Création Audiovisuelle</span><i>✦</i><span>Solutions IA</span><i>✦</i>
+          <span>Identité Visuelle</span><i>✦</i><span>Réseaux Sociaux</span><i>✦</i><span>Publicité &amp; Stratégie</span><i>✦</i><span>Création Audiovisuelle</span><i>✦</i><span>Solutions IA</span><i>✦</i>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== HOW TO ===== -->
+    <section class="screen" id="screen-howto">
+      <div class="card">
+        <div class="card-eyebrow">MODE D'EMPLOI</div>
+        <h2 class="card-title">Comment jouer</h2>
+        <ul class="howto">
+          <li><b>Déplace le Z</b> avec la souris, le doigt ou les flèches ← → pour attraper les bonnes idées.</li>
+          <li><b>Évite</b> les bugs, le spam et les bad buzz : chacun te coûte une vie de <b>budget</b>.</li>
+          <li><b>Enchaîne</b> les captures pour monter ton <b>combo</b> jusqu'à x5.</li>
+          <li><b>Atteins l'objectif</b> de chaque campagne avant la deadline.</li>
+          <li>Entre deux campagnes : <b>Brief Flash</b>, un quiz marketing pour gagner des bonus.</li>
+          <li>Termine les <b>5 campagnes</b> pour devenir viral et battre ton record !</li>
+        </ul>
+        <div class="legend" id="legend-howto"></div>
+        <div class="keys"><kbd>←</kbd><kbd>→</kbd> bouger · <kbd>P</kbd> pause · <kbd>M</kbd> musique · <kbd>S</kbd> sons</div>
+        <button class="btn" data-action="home"><span>C'EST PARTI</span><i class="arr">→</i></button>
+      </div>
+    </section>
+
+    <!-- ===== BRIEF (level intro) ===== -->
+    <section class="screen" id="screen-brief">
+      <div class="card card-brief">
+        <div class="card-eyebrow">BRIEF <b id="brief-num">01</b> / 05</div>
+        <h2 class="card-title big" id="brief-title">Identité Visuelle</h2>
+        <p class="card-text" id="brief-text"></p>
+        <div class="brief-goals">
+          <div class="goal"><span class="goal-k">OBJECTIF</span><span class="goal-v" id="brief-target">700 pts</span></div>
+          <div class="goal"><span class="goal-k">DEADLINE</span><span class="goal-v" id="brief-time">60 s</span></div>
+          <div class="goal"><span class="goal-k">DIFFICULTÉ</span><span class="goal-v stars" id="brief-diff">●○○○○</span></div>
+        </div>
+        <div class="legend" id="legend-brief"></div>
+        <button class="btn" id="btn-start-level"><span>LANCER LA CAMPAGNE</span><i class="arr">→</i></button>
+      </div>
+    </section>
+
+    <!-- ===== LEVEL CLEAR ===== -->
+    <section class="screen" id="screen-clear">
+      <div class="card">
+        <div class="check-badge"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+        <div class="card-eyebrow">CAMPAGNE <b id="clear-num">01</b> RÉUSSIE</div>
+        <h2 class="card-title" id="clear-title">Objectif atteint !</h2>
+        <div class="stats" id="clear-stats"></div>
+        <button class="btn" id="btn-to-quiz"><span>BRIEF FLASH</span><i class="arr">→</i></button>
+      </div>
+    </section>
+
+    <!-- ===== QUIZ ===== -->
+    <section class="screen" id="screen-quiz">
+      <div class="card card-quiz">
+        <div class="quiz-head">
+          <div class="card-eyebrow">⚡ BRIEF FLASH · <b id="quiz-idx">1</b>/3</div>
+          <div class="quiz-bonus">+<b id="quiz-bonus">0</b> pts</div>
+        </div>
+        <div class="quiz-timer"><i id="quiz-timer"></i></div>
+        <h2 class="quiz-q" id="quiz-q">Question</h2>
+        <div class="quiz-answers" id="quiz-answers"></div>
+        <div class="quiz-end" id="quiz-end">
+          <p class="card-text" id="quiz-summary"></p>
+          <button class="btn" id="btn-next-level"><span>BRIEF SUIVANT</span><i class="arr">→</i></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== PAUSE ===== -->
+    <section class="screen" id="screen-pause">
+      <div class="card card-small">
+        <div class="card-eyebrow">PAUSE</div>
+        <h2 class="card-title">Pause café ☕</h2>
+        <p class="card-text">La campagne t'attend.</p>
+        <button class="btn" id="btn-resume"><span>REPRENDRE</span><i class="arr">→</i></button>
+        <button class="btn btn-ghost" data-action="home"><span>QUITTER</span></button>
+      </div>
+    </section>
+
+    <!-- ===== GAME OVER ===== -->
+    <section class="screen" id="screen-over">
+      <div class="card">
+        <div class="card-eyebrow red" id="over-reason">BUDGET ÉPUISÉ</div>
+        <h2 class="card-title big">Campagne<br />interrompue</h2>
+        <div class="final-score"><span class="fs-k">SCORE</span><span class="fs-v" id="over-score">0</span></div>
+        <div class="new-record" id="over-record">🏆 NOUVEAU RECORD !</div>
+        <div class="stats" id="over-stats"></div>
+        <button class="btn" data-action="restart"><span>REJOUER</span><i class="arr">↻</i></button>
+        <button class="btn btn-ghost" data-action="home"><span>MENU</span></button>
+      </div>
+    </section>
+
+    <!-- ===== VICTORY ===== -->
+    <section class="screen" id="screen-win">
+      <div class="win-wrap">
+        <div class="win-rays"></div>
+        <img src="assets/img/logo-vizea.png" alt="ViZea" class="win-logo" />
+        <div class="win-kicker">5 / 5 CAMPAGNES RÉUSSIES</div>
+        <h2 class="win-title"><span>CAMPAGNE</span><span class="g">VIRALE !</span></h2>
+        <div class="final-score win"><span class="fs-k">SCORE FINAL</span><span class="fs-v" id="win-score">0</span></div>
+        <div class="new-record" id="win-record">🏆 NOUVEAU RECORD !</div>
+        <div class="stats" id="win-stats"></div>
+        <div class="win-actions">
+          <button class="btn" data-action="restart"><span>REJOUER · BATTRE MON RECORD</span><i class="arr">↻</i></button>
+          <button class="btn btn-ghost" data-action="home"><span>MENU</span></button>
+        </div>
+      </div>
+    </section>
+
+    <div class="rotate-hint" id="loader"><img src="assets/img/favicon.png" alt="" /></div>
+  </div>
+
+  <script src="js/audio.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>

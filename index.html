@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <meta name="theme-color" content="#070809" />
+  <title>ViZea Jump</title>
+  <meta name="description" content="PLAY WITH VIZEA — ViZea Jump : saute de cercle en cercle et bats ton record." />
+  <link rel="icon" type="image/png" href="assets/img/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@300;500;700&family=Cairo:wght@500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="app" class="is-home">
+    <canvas id="game"></canvas>
+    <canvas id="fx" aria-hidden="true"></canvas>
+
+    <!-- Top bar -->
+    <header class="topbar">
+      <div class="corner">
+        <img src="assets/img/favicon.png" alt="ViZea" class="corner-logo" />
+      </div>
+      <div class="controls">
+        <button class="icon-btn" id="btn-mute" aria-label="Son" title="Son (M)">
+          <svg viewBox="0 0 24 24" class="ico-on"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 010 7M19 5a10 10 0 010 14"/></svg>
+          <svg viewBox="0 0 24 24" class="ico-off"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M22 9l-6 6M16 9l6 6"/></svg>
+        </button>
+        <button class="icon-btn" id="btn-settings" aria-label="Réglages" title="Réglages">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- HUD -->
+    <div class="hud">
+      <div class="score" id="score">0</div>
+      <span class="combo" id="combo">x1</span>
+      <div class="lives" id="lives"></div>
+    </div>
+    <div class="combo-pop" id="combo-pop"></div>
+    <div class="streak" id="streak"></div>
+    <div class="hint" id="hint" data-i18n="hint">TAP POUR SAUTER</div>
+    <div class="banner" id="banner"></div>
+    <div class="toast" id="toast"></div>
+
+    <!-- Home -->
+    <section class="screen active" id="screen-home">
+      <div class="home">
+        <span class="play-with">PLAY WITH</span>
+        <img src="assets/img/logo-vizea.png" alt="ViZea" class="home-logo" />
+        <span class="jump-word">JUMP</span>
+        <p class="tag" data-i18n-html="tag"></p>
+        <button class="btn-play" id="btn-play"><span>PLAY</span><i><svg viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></svg></i></button>
+        <div class="record">🏆 <span data-i18n="record">RECORD</span> <b id="home-best">0</b></div>
+        <div class="home-links">
+          <button class="pill-btn" data-open="games">🎮 <span data-i18n="moreGames"></span></button>
+          <button class="pill-btn" data-open="settings">⚙️ <span data-i18n="settings"></span></button>
+          <button class="pill-btn" data-open="settings" id="lang-pill">🌐 <span id="lang-short">FR</span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Game over -->
+    <section class="screen" id="screen-over">
+      <div class="over">
+        <div class="over-top">
+          <button class="close" data-action="home" aria-label="Menu">✕</button>
+          <span class="reason" id="over-reason"></span>
+        </div>
+        <div class="over-score" id="over-score">0</div>
+        <div class="ribbon" id="over-rank"></div>
+        <div class="new-record" id="over-record" data-i18n="newRecord"></div>
+        <div class="tiles">
+          <div class="tile"><b id="st-combo">x1</b><span>⚡ <span data-i18n="combo"></span></span></div>
+          <div class="tile"><b id="st-jumps">0</b><span>↗ <span data-i18n="jumps"></span></span></div>
+          <div class="tile"><b id="st-best">0</b><span>🏆 <span data-i18n="recordT"></span></span></div>
+        </div>
+        <div class="panel">
+          <p class="goal-line" id="goal-line"></p>
+          <div class="bar gold"><i id="bar-record"></i></div>
+          <div class="row-line"><span><b data-i18n="daily"></b> <span data-i18n="dailyTxt"></span></span><em id="daily-txt">1/10</em></div>
+          <div class="bar silver"><i id="bar-daily"></i></div>
+          <div class="row-line"><span><b><span data-i18n="level"></span> <em id="lvl">1</em></b></span><em id="xp-txt">0 / 500 XP</em></div>
+          <div class="bar gold"><i id="bar-xp"></i></div>
+        </div>
+        <div class="panel panel-gold">
+          <b id="games-played"></b>
+          <span id="avg-line"></span>
+        </div>
+        <button class="btn-big" data-action="restart" data-i18n="replay"></button>
+        <div class="share-card">
+          <div>
+            <b data-i18n="shareT"></b>
+            <span data-i18n="shareD"></span>
+          </div>
+          <button class="share-btn" id="btn-share">↗ <span data-i18n="share"></span></button>
+        </div>
+        <div class="two">
+          <button class="btn-dark" data-action="home" data-i18n="menu"></button>
+          <button class="btn-dark" id="btn-challenge" data-i18n="challenge"></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Settings -->
+    <section class="screen modal" id="screen-settings">
+      <div class="card">
+        <button class="close" data-close aria-label="OK">✕</button>
+        <div class="eyebrow">⚙️ <span data-i18n="settingsUp"></span></div>
+        <h2 class="title" data-i18n="soundVoice"></h2>
+
+        <div class="set-label">🌐 <span data-i18n="language"></span></div>
+        <div class="seg" id="seg-lang">
+          <button data-lang="fr">Français</button>
+          <button data-lang="en">English</button>
+          <button data-lang="ar" class="ar-font">الدارجة</button>
+        </div>
+
+        <div class="set-row">
+          <label for="vol-music">🎵 <span data-i18n="music"></span></label>
+          <button class="switch" id="sw-music" role="switch"></button>
+        </div>
+        <input type="range" id="vol-music" min="0" max="100" />
+
+        <div class="set-row">
+          <label for="vol-sfx">🔊 <span data-i18n="sfx"></span></label>
+          <button class="switch" id="sw-sfx" role="switch"></button>
+        </div>
+        <input type="range" id="vol-sfx" min="0" max="100" />
+
+        <div class="set-label">🎧 <span data-i18n="musicStyle"></span></div>
+        <div class="seg" id="seg-theme">
+          <button data-theme="pulse">Pulse</button>
+          <button data-theme="chill">Chill</button>
+          <button data-theme="hype">Hype</button>
+        </div>
+
+        <div class="set-row" hidden>
+          <label>🗣️ <span data-i18n="voice"></span></label>
+          <button class="switch" id="sw-voice" role="switch"></button>
+        </div>
+        <div class="voice-row" hidden>
+          <select id="voice-select" aria-label="Voice"></select>
+          <button class="test-btn" id="btn-voice-test">▶ <span data-i18n="test"></span></button>
+        </div>
+
+        <div class="set-row">
+          <label>📳 <span data-i18n="vibration"></span></label>
+          <button class="switch" id="sw-vibe" role="switch"></button>
+        </div>
+
+        <button class="btn-big" data-close data-i18n="ok"></button>
+      </div>
+    </section>
+
+    <!-- More games -->
+    <section class="screen modal" id="screen-games">
+      <div class="card">
+        <button class="close" data-close aria-label="OK">✕</button>
+        <div class="eyebrow">🎮 PLAY WITH VIZEA</div>
+        <h2 class="title" data-i18n="moreGames"></h2>
+        <div class="games">
+          <button class="game-card current" data-close>
+            <span class="gc-ico">↗</span>
+            <span class="gc-txt"><b>ViZea Jump</b><small data-i18n="jumpDesc"></small></span>
+            <span class="gc-tag" data-i18n="current"></span>
+          </button>
+          <a class="game-card" href="games/catch/index.html">
+            <span class="gc-ico">✦</span>
+            <span class="gc-txt"><b>ViZea Catch</b><small data-i18n="catchDesc"></small></span>
+            <span class="gc-tag go" data-i18n="play"></span>
+          </a>
+          <div class="game-card soon">
+            <span class="gc-ico">?</span>
+            <span class="gc-txt"><b data-i18n="soonT"></b><small data-i18n="soonD"></small></span>
+            <span class="gc-tag" data-i18n="soon"></span>
+          </div>
+        </div>
+        <button class="btn-big" data-close data-i18n="back"></button>
+      </div>
+    </section>
+  </div>
+
+  <script src="js/audio.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
