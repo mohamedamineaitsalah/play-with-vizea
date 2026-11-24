@@ -123,7 +123,8 @@
   function genCircle(prev, idx) {
     const d = diff();
     const r = colW * rand(0.125, 0.15) * (1 - d * 0.42);
-    const gap = colW * rand(0.02, 0.08) * (1 + d * 1.6);
+    // plus tu joues bien (plus de points), plus il y a d'espace entre les cercles
+    const gap = colW * rand(0.04, 0.09) * (1 + d * 3);
     const y = prev.y - (prev.r + r + gap);
     const m = colW * 0.04;
     let kind = "normal", amp = 0;
