@@ -124,7 +124,7 @@
     const d = diff();
     const r = colW * rand(0.125, 0.15) * (1 - d * 0.42);
     // plus tu joues bien (plus de points), plus il y a d'espace entre les cercles
-    const gap = colW * rand(0.04, 0.09) * (1 + d * 3);
+    const gap = colW * (rand(0.005, 0.04) + d * rand(0.08, 0.2));
     const y = prev.y - (prev.r + r + gap);
     const m = colW * 0.04;
     let kind = "normal", amp = 0;
@@ -136,7 +136,7 @@
     x = Math.min(hi, Math.max(lo, x));
     return {
       x, baseX: x, y, r, kind, amp, ph: Math.random() * 6.28, ms: rand(0.9, 1.5) * (1 + d),
-      w: (3.0 + 2.2 * d) * rand(0.92, 1.08) * (Math.random() < 0.5 ? -1 : 1),
+      w: (4.4 + 1.6 * d) * rand(0.92, 1.08) * (Math.random() < 0.5 ? -1 : 1),
       pulse: 0, life: 1, lifeMax: rand(2.4, 1.6) - d * 0.4, broken: false, idx,
     };
   }
@@ -146,7 +146,7 @@
   function reset() {
     S.circles = []; S.parts = []; S.floats = []; S.rings = [];
     S.score = 0; S.jumps = 0; S.combo = 0; S.bestCombo = 0; S.milestone = 0; S.lives = MAX_LIVES; S.maxCi = 0;
-    S.circles.push({ x: colW / 2, baseX: colW / 2, y: 0, r: colW * 0.15, kind: "normal", amp: 0, ph: 0, ms: 0, w: 3.0, pulse: 0, life: 1, lifeMax: 2, broken: false, idx: 0 });
+    S.circles.push({ x: colW / 2, baseX: colW / 2, y: 0, r: colW * 0.15, kind: "normal", amp: 0, ph: 0, ms: 0, w: 4.4, pulse: 0, life: 1, lifeMax: 2, broken: false, idx: 0 });
     Object.assign(S.ball, { state: "orbit", ci: 0, a: -Math.PI * 0.15, trail: [], fall: 0, lap: 0, lapA: -Math.PI * 0.15, bounced: false });
     ensureCircles();
     S.camY = S.circles[0].y - H * 0.64;
@@ -197,8 +197,8 @@
     if (S.mode !== "play" || S.ball.state !== "orbit") return;
     const c = S.circles[S.ball.ci], s = Math.sign(c.w);
     const tx = -Math.sin(S.ball.a) * s, ty = Math.cos(S.ball.a) * s;
-    // vitesse moyenne constante, même quand le jeu accélère
-    const sp = colW * 1.35;
+    // vitesse de vol calée sur la vidéo : glisse calme, constante
+    const sp = colW * 0.6;
     Object.assign(S.ball, { state: "fly", vx: tx * sp, vy: ty * sp, p0x: S.ball.x, p0y: S.ball.y, sq: 1, from: S.ball.ci, bounced: false });
     S.flyT = 0; S.tickI = -1;
     A.play("jump");
@@ -233,8 +233,9 @@
     c.pulse = 1;
     if (c.kind === "fragile") c.life = 1;
     S.rings.push({ x: c.x, y: c.y, r: c.r, life: 1, col: good ? C.yellow : "#fff" });
-    burst(b.x, b.y, good ? C.gold : "#fff", good ? 18 : 8);
-    S.floats.push({ x: c.x + c.r * 0.45, y: c.y, txt: "+" + pts, life: 1, color: "#fff", big: good });
+    burst(b.x, b.y, "#ffffff", good ? 16 : 8, 0.7, true);
+    burst(b.x, b.y, C.gold, good ? 8 : 4, 0.6, true);
+    S.floats.push({ x: c.x, y: c.y + c.r * 0.2, txt: "+" + pts, life: 1, color: "#fff", big: good });
     if (lower) streak(t("lower"));
     else if (b.bounced) streak(t("bounce"));
     else if (center) streak(t("center"));
@@ -422,10 +423,10 @@
   function toast(txt) { const el = $("#toast"); el.textContent = txt; el.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove("show"), 2600); }
 
   // ---------- particules ----------
-  function burst(x, y, color, n, pw) {
+  function burst(x, y, color, n, pw, squares) {
     for (let i = 0; i < n; i++) {
       const a = Math.random() * 6.283, s = rand(60, 240) * (pw || 1) * U;
-      S.parts.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, life: rand(0.4, 0.8), max: 0.8, size: rand(1.8, 4) * U, color });
+      S.parts.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, life: rand(0.4, 0.8), max: 0.8, size: rand(1.8, 4) * U, color, sq: !!squares });
     }
   }
 
@@ -579,17 +580,27 @@
     if (b.state === "orbit" && S.mode === "play") {
       const c = S.circles[b.ci], s = Math.sign(c.w);
       const tx = -Math.sin(b.a) * s, ty = Math.cos(b.a) * s;
-      const len = colW * Math.max(0.14, 0.34 - S.score / 12000);
+      const len = colW * Math.max(0.25, 0.5 - S.score / 16000);
       const g = ctx.createLinearGradient(b.x, b.y, b.x + tx * len, b.y + ty * len);
       g.addColorStop(0, "rgba(242,207,29,.9)"); g.addColorStop(1, "rgba(242,207,29,0)");
       ctx.strokeStyle = g; ctx.lineWidth = 2 * U; ctx.setLineDash([5 * U, 6 * U]); ctx.lineDashOffset = -S.t * 40;
       ctx.beginPath(); ctx.moveTo(b.x, b.y); ctx.lineTo(b.x + tx * len, b.y + ty * len); ctx.stroke();
       ctx.setLineDash([]);
     }
-    // traînée dorée
-    for (let i = 1; i < b.trail.length; i++) {
+    // queue de comète dorée pendant le vol
+    if (b.state === "fly") {
+      const v = Math.hypot(b.vx, b.vy) || 1, ux = b.vx / v, uy = b.vy / v;
+      const L = colW * 0.12, w0 = ballR() * 0.9;
+      const ex = b.x - ux * L, ey = b.y - uy * L;
+      const g = ctx.createLinearGradient(b.x, b.y, ex, ey);
+      g.addColorStop(0, "rgba(255,236,130,0.95)"); g.addColorStop(0.45, "rgba(242,190,29,0.6)"); g.addColorStop(1, "rgba(242,150,29,0)");
+      ctx.save(); ctx.fillStyle = g; ctx.shadowColor = C.gold; ctx.shadowBlur = 12;
+      ctx.beginPath(); ctx.moveTo(b.x - uy * w0, b.y + ux * w0); ctx.lineTo(ex, ey); ctx.lineTo(b.x + uy * w0, b.y - ux * w0); ctx.closePath(); ctx.fill();
+      ctx.restore();
+    }
+    for (let i = 1; i < b.trail.length && b.state !== "fly"; i++) {
       const p = b.trail[i], q = b.trail[i - 1], k = i / b.trail.length;
-      ctx.strokeStyle = `rgba(242,207,29,${k * 0.55})`; ctx.lineWidth = ballR() * 0.75 * k; ctx.lineCap = "round";
+      ctx.strokeStyle = `rgba(242,207,29,${k * 0.35})`; ctx.lineWidth = ballR() * 0.5 * k; ctx.lineCap = "round";
       ctx.beginPath(); ctx.moveTo(q.x, q.y); ctx.lineTo(p.x, p.y); ctx.stroke();
     }
     // balle ViZea
@@ -599,7 +610,7 @@
     ctx.translate(b.x + (danger ? rand(-1, 1) * danger * 5 * U : 0), b.y + (danger ? rand(-1, 1) * danger * 5 * U : 0));
     if (b.state === "gone") ctx.scale(0, 0);
     if (danger) { const sw = 1 + danger * 0.45 + Math.sin(S.t * (20 + danger * 40)) * 0.08 * danger; ctx.scale(sw, sw); }
-    if (b.state === "fly") { const ang = Math.atan2(b.vy, b.vx); const st2 = 1 + Math.max(0, b.sq) * 0.35; ctx.rotate(ang); ctx.scale(st2, 1 / st2); ctx.rotate(-ang); }
+    if (b.state === "fly") { const ang = Math.atan2(b.vy, b.vx); const st2 = 1 + Math.max(0, b.sq) * 0.08; ctx.rotate(ang); ctx.scale(st2, 1 / st2); ctx.rotate(-ang); }
     else if (b.sq < 0) { const p = 1 + b.sq * -0.3; ctx.scale(p, 1 / p); }
     const pulse = 1 + Math.sin(S.t * 6) * 0.04;
     ctx.scale(pulse, pulse);
@@ -653,9 +664,13 @@
         }
       }
     }
-    for (const p of S.parts) { ctx.globalAlpha = Math.max(0, p.life / p.max); ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, 6.283); ctx.fill(); }
+    for (const p of S.parts) {
+      ctx.globalAlpha = Math.max(0, p.life / p.max); ctx.fillStyle = p.color;
+      if (p.sq) ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size);
+      else { ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, 6.283); ctx.fill(); }
+    }
     ctx.globalAlpha = 1;
-    ctx.textAlign = "left"; ctx.textBaseline = "middle";
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
     for (const f of S.floats) {
       ctx.globalAlpha = Math.min(1, f.life * 2);
       ctx.font = `300 ${(f.big ? 24 : 20) * U}px "Space Grotesk", sans-serif`;
