@@ -196,7 +196,8 @@
     if (S.mode !== "play" || S.ball.state !== "orbit") return;
     const c = S.circles[S.ball.ci], s = Math.sign(c.w);
     const tx = -Math.sin(S.ball.a) * s, ty = Math.cos(S.ball.a) * s;
-    const sp = colW * 1.35 * (1 + diff() * 0.15);
+    // la balle accélère exactement comme le cercle : plus il tourne vite, plus elle part vite
+    const sp = colW * 1.35 * Math.max(1, Math.abs(c.w) / 2.4);
     Object.assign(S.ball, { state: "fly", vx: tx * sp, vy: ty * sp, p0x: S.ball.x, p0y: S.ball.y, sq: 1, from: S.ball.ci, bounced: false });
     S.flyT = 0; S.tickI = -1;
     A.play("jump");
@@ -211,12 +212,12 @@
     const lower = !isNew;
     const n = isNew ? j - S.maxCi : 0;
     if (isNew) S.maxCi = j;
-    // nouveau cercle : le combo monte (max x8 = 80 points) ; cercle déjà visité : 0 point et combo remis à zéro
+    // nouveau cercle : 20 points x combo (combo 0 ou x1 = 20, x8 = 160) ; cercle déjà visité : 0 point et combo remis à zéro
     const good = isNew;
     if (good) { S.combo = Math.min(MAX_COMBO, S.combo + 1); comboPop(t("comboPop", { n: S.combo })); }
     else { if (S.combo > 1) comboPop(t("comboLost"), true); S.combo = 0; }
     S.bestCombo = Math.max(S.bestCombo, S.combo);
-    let pts = 10 * S.combo * n;
+    let pts = 20 * Math.max(1, S.combo) * n;
     const center = good && dc < 0.13;
     if (center) pts += 20;
     if (b.bounced && pts > 0) pts *= 2;
