@@ -318,6 +318,7 @@
     stopFx();
     const prevBest = S.startBest;
     const isNew = S.score > prevBest && S.score > 0;
+    S.lastIsNew = isNew;
     if (S.score > S.best) { S.best = S.score; st.set("vzj_best", S.best); }
     // stats persistantes
     const days = st.get("vzj_days", []);
@@ -345,6 +346,7 @@
     const bars = { "#bar-record": S.best ? (S.score / S.best) * 100 : 0, "#bar-daily": (Math.min(10, days.length) / 10) * 100, "#bar-xp": ((xp % 500) / 500) * 100 };
     Object.keys(bars).forEach((k) => ($(k).style.width = "0%"));
     show("over");
+    setTimeout(() => { prepareShare().catch(() => {}); }, 400); // prépare l'image du score
     requestAnimationFrame(() => requestAnimationFrame(() => Object.entries(bars).forEach(([k, v]) => ($(k).style.width = Math.min(100, v) + "%"))));
     A.play("gameOver");
     A.resetTheme();
@@ -784,17 +786,141 @@
   });
   $("#btn-settings").addEventListener("click", (e) => { e.currentTarget.blur(); A.resume(); openModal("settings"); });
 
-  // ---------- partage ----------
-  async function share(challenge) {
-    const text = challenge ? t("challengeText", { n: fmt(S.score) }) : t("shareText", { n: fmt(S.score), c: S.bestCombo });
-    try {
-      if (navigator.share) { await navigator.share({ title: "ViZea Jump", text, url: location.href.split("#")[0] }); return; }
-      await navigator.clipboard.writeText(text + " " + location.href.split("#")[0]);
-      toast(t("copied"));
-    } catch (e) { if (e && e.name !== "AbortError") toast(t("noShare")); }
+  // ---------- partage : image du score avec le logo ViZea ----------
+  const GAME_URL = "https://mohamedamineaitsalah.github.io/play-with-vizea/";
+  let shareBlob = null, shareURL = null, shareFor = "", shareChallenge = false;
+
+  function rr(g, x, y, w, h, r) {
+    g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r);
+    g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath();
   }
-  $("#btn-share").addEventListener("click", () => share(false));
-  $("#btn-challenge").addEventListener("click", () => share(true));
+  async function makeShareImage() {
+    const ar = lang === "ar";
+    const TXT = ar ? '"Cairo", "Space Grotesk", sans-serif' : '"Space Grotesk", "Inter", sans-serif';
+    try {
+      await Promise.all(["800 100px Dexperdy", "italic 800 100px Dexperdy", '300 100px "Space Grotesk"', '500 60px "Space Grotesk"', '700 40px "Space Grotesk"', "700 40px Cairo"].map((f) => document.fonts.load(f)));
+    } catch (e) { /* polices de secours */ }
+    const Wc = 1080, Hc = 1350;
+    const c = document.createElement("canvas"); c.width = Wc; c.height = Hc;
+    const g = c.getContext("2d");
+    const ls = (v) => { if ("letterSpacing" in g) g.letterSpacing = v; };
+    // fond ViZea
+    g.fillStyle = "#070809"; g.fillRect(0, 0, Wc, Hc);
+    let gr = g.createRadialGradient(Wc / 2, 560, 0, Wc / 2, 560, 900);
+    gr.addColorStop(0, "rgba(30,215,96,0.32)"); gr.addColorStop(0.5, "rgba(30,215,96,0.08)"); gr.addColorStop(1, "rgba(0,0,0,0)");
+    g.fillStyle = gr; g.fillRect(0, 0, Wc, Hc);
+    g.save(); g.translate(Wc / 2, Hc / 2); g.rotate(-Math.PI / 4);
+    [[-260, 110, 0.22], [20, 70, 0.16], [330, 40, 0.1]].forEach(([y, th, a]) => {
+      const lg = g.createLinearGradient(-1000, 0, 1000, 0);
+      lg.addColorStop(0, "rgba(30,215,96,0)"); lg.addColorStop(0.5, `rgba(30,215,96,${a})`); lg.addColorStop(1, "rgba(30,215,96,0)");
+      g.fillStyle = lg; g.fillRect(-1000, y - th / 2, 2000, th);
+    });
+    g.restore();
+    if (logo.complete && logo.naturalWidth) { g.save(); g.globalAlpha = 0.09; g.drawImage(logo, 0, 0, 338, 338, Wc / 2 - 560, 260, 1120, 1120); g.restore(); }
+    const vg = g.createRadialGradient(Wc / 2, Hc / 2, 300, Wc / 2, Hc / 2, 900);
+    vg.addColorStop(0, "rgba(0,0,0,0)"); vg.addColorStop(1, "rgba(0,0,0,0.65)");
+    g.fillStyle = vg; g.fillRect(0, 0, Wc, Hc);
+    // cadre
+    rr(g, 30, 30, Wc - 60, Hc - 60, 48); g.lineWidth = 3; g.strokeStyle = "rgba(30,215,96,0.45)"; g.stroke();
+    g.textAlign = "center"; g.textBaseline = "middle";
+    // logo + JUMP
+    if (logo.complete && logo.naturalWidth) {
+      g.save(); g.shadowColor = "rgba(30,215,96,0.6)"; g.shadowBlur = 40;
+      g.drawImage(logo, Wc / 2 - 290, 96, 580, 580 * 338 / 1200); g.restore();
+    }
+    g.save(); g.font = "italic 800 118px Dexperdy, sans-serif"; g.fillStyle = C.yellow; g.shadowColor = "rgba(252,255,69,0.5)"; g.shadowBlur = 30;
+    g.fillText("JUMP", Wc / 2, 356); g.restore();
+    // score
+    g.direction = ar ? "rtl" : "ltr";
+    g.font = `700 34px ${TXT}`; g.fillStyle = "rgba(255,255,255,0.62)"; ls("10px");
+    g.fillText(t("imgScore"), Wc / 2, 462); ls("0px");
+    g.direction = "ltr";
+    g.save(); g.font = '300 250px "Space Grotesk", sans-serif'; g.fillStyle = "#fff"; g.shadowColor = "rgba(30,215,96,0.7)"; g.shadowBlur = 60;
+    g.fillText(fmt(S.score), Wc / 2, 610); g.restore();
+    // ruban du rang
+    const rank = rankFor(S.score);
+    g.direction = ar ? "rtl" : "ltr";
+    g.font = `700 44px ${TXT}`;
+    const rw = Math.max(380, g.measureText(rank).width + 150), ry = 752;
+    const rg = g.createLinearGradient(0, ry - 42, 0, ry + 42); rg.addColorStop(0, "#fff56a"); rg.addColorStop(1, "#d8b800");
+    g.fillStyle = rg; g.beginPath();
+    g.moveTo(Wc / 2 - rw / 2, ry - 42); g.lineTo(Wc / 2 + rw / 2, ry - 42); g.lineTo(Wc / 2 + rw / 2 - 30, ry); g.lineTo(Wc / 2 + rw / 2, ry + 42);
+    g.lineTo(Wc / 2 - rw / 2, ry + 42); g.lineTo(Wc / 2 - rw / 2 + 30, ry); g.closePath(); g.fill();
+    g.fillStyle = C.ink; g.fillText(rank, Wc / 2, ry + 3);
+    // nouveau record
+    let y0 = 852;
+    if (S.lastIsNew) {
+      g.font = `700 34px ${TXT}`;
+      const nt = t("newRecord"), nw = g.measureText(nt).width + 70;
+      g.save(); g.shadowColor = "rgba(252,255,69,0.6)"; g.shadowBlur = 30; rr(g, Wc / 2 - nw / 2, y0 - 32, nw, 64, 32); g.fillStyle = C.yellow; g.fill(); g.restore();
+      g.fillStyle = C.ink; g.fillText(nt, Wc / 2, y0 + 2);
+      y0 += 70;
+    } else y0 += 10;
+    // statistiques
+    g.direction = "ltr";
+    const tiles = [["x" + S.bestCombo, "⚡ " + t("combo")], [String(S.jumps), "↗ " + t("jumps")], [fmt(S.best), "🏆 " + t("recordT")]];
+    const tw = 290, gap = 30, tx0 = (Wc - (tw * 3 + gap * 2)) / 2, th = 170, ty = y0 + 10;
+    tiles.forEach(([v, l], i) => {
+      const x = tx0 + i * (tw + gap);
+      rr(g, x, ty, tw, th, 28); g.fillStyle = i === 2 ? "rgba(252,255,69,0.08)" : "rgba(255,255,255,0.05)"; g.fill();
+      g.lineWidth = 2; g.strokeStyle = i === 2 ? "rgba(252,255,69,0.45)" : "rgba(255,255,255,0.14)"; g.stroke();
+      g.font = '500 66px "Space Grotesk", sans-serif'; g.fillStyle = i === 2 ? C.yellow : "#fff"; g.fillText(v, x + tw / 2, ty + 70);
+      g.direction = ar ? "rtl" : "ltr";
+      g.font = `700 28px ${TXT}`; g.fillStyle = "rgba(255,255,255,0.62)"; g.fillText(l, x + tw / 2, ty + 132);
+      g.direction = "ltr";
+    });
+    // défi + lien
+    const by = Math.min(Hc - 160, ty + th + 80);
+    g.direction = ar ? "rtl" : "ltr";
+    g.font = `800 50px ${TXT}`; g.fillStyle = C.green; g.fillText(t("imgBeat"), Wc / 2, by);
+    g.direction = "ltr";
+    g.font = '500 28px "Space Grotesk", sans-serif'; g.fillStyle = "rgba(255,255,255,0.7)";
+    g.fillText(GAME_URL.replace("https://", "").replace(/\/$/, ""), Wc / 2, by + 60);
+    g.font = '700 28px "Space Grotesk", sans-serif'; g.fillStyle = C.yellow; g.fillText("#PlayWithViZea", Wc / 2, by + 104);
+    return new Promise((res) => c.toBlob((b) => res(b), "image/png"));
+  }
+
+  async function prepareShare() {
+    const key = [S.score, S.best, S.bestCombo, S.jumps, lang, !!S.lastIsNew].join("|");
+    if (shareBlob && shareFor === key) return;
+    const blob = await makeShareImage();
+    if (!blob) return;
+    shareBlob = blob; shareFor = key;
+    if (shareURL) URL.revokeObjectURL(shareURL);
+    shareURL = URL.createObjectURL(blob);
+    const img = $("#share-img"); img.src = shareURL;
+    $("#btn-share-dl").href = shareURL;
+    $("#share-loading").hidden = true;
+  }
+  const shareText = () => (shareChallenge ? t("challengeText", { n: fmt(S.score) }) : t("shareText", { n: fmt(S.score), c: S.bestCombo })) + " " + GAME_URL;
+  async function openShare(challenge) {
+    shareChallenge = challenge;
+    openModal("share");
+    if (!shareBlob) $("#share-loading").hidden = false;
+    await prepareShare();
+  }
+  async function copyShareText() {
+    try { await navigator.clipboard.writeText(shareText()); toast(t("copied")); }
+    catch (e) { toast(t("noShare")); }
+  }
+  $("#btn-share").addEventListener("click", () => { A.play("click"); openShare(false); });
+  $("#btn-challenge").addEventListener("click", () => { A.play("click"); openShare(true); });
+  $("#btn-share-copy").addEventListener("click", () => { A.play("click"); copyShareText(); });
+  $("#btn-share-dl").addEventListener("click", (e) => { if (!shareURL) { e.preventDefault(); return; } A.play("click"); setTimeout(() => toast(t("saved")), 300); });
+  $("#btn-share-now").addEventListener("click", () => {
+    A.play("click");
+    if (!shareBlob) { prepareShare(); return; }
+    const file = new File([shareBlob], "vizea-jump-score.png", { type: "image/png" });
+    const data = { files: [file], title: "ViZea Jump", text: shareText() };
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      // téléphone : ouvre WhatsApp, Instagram, Snapchat… avec l'image
+      navigator.share(data).catch((e) => { if (e && e.name !== "AbortError") { $("#btn-share-dl").click(); copyShareText(); } });
+    } else {
+      // ordinateur : télécharge l'image et copie le texte
+      $("#btn-share-dl").click();
+      copyShareText();
+    }
+  });
 
   // ---------- entrées ----------
   cv.addEventListener("pointerdown", (e) => { e.preventDefault(); A.resume(); jump(); });
@@ -826,7 +952,7 @@
   }
   unlockEvents.forEach((ev) => window.addEventListener(ev, unlockSound, { capture: true, passive: true }));
 
-  if (location.hash === "#debug") window.__vzj = { S, update, render, jump, gameOver, colW: () => colW };
+  if (location.hash === "#debug") window.__vzj = { S, update, render, jump, gameOver, colW: () => colW, makeShareImage, openShare };
 
   if ("speechSynthesis" in window) { Voice.load(); speechSynthesis.onvoiceschanged = () => Voice.load(); }
   else fillVoices();

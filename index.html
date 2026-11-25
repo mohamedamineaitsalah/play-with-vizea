@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@300;500;700&family=Cairo:wght@500;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css?v=20261125f" />
+  <link rel="stylesheet" href="css/style.css?v=20261125g" />
 </head>
 <body>
   <div id="app" class="is-home">
@@ -120,6 +120,22 @@
       </div>
     </section>
 
+    <!-- Share picture -->
+    <section class="screen modal" id="screen-share">
+      <div class="card share-modal">
+        <button class="close" data-close aria-label="OK">✕</button>
+        <div class="eyebrow">↗ <span data-i18n="share"></span></div>
+        <h2 class="title" data-i18n="shareTitle"></h2>
+        <div class="share-frame"><img id="share-img" alt="ViZea Jump score" /><span class="share-loading" id="share-loading">…</span></div>
+        <button class="btn-big" id="btn-share-now" data-i18n="shareNow"></button>
+        <div class="two">
+          <a class="btn-dark btn-link" id="btn-share-dl" href="#" download="vizea-jump-score.png" data-i18n="download"></a>
+          <button class="btn-dark" id="btn-share-copy" data-i18n="copyText"></button>
+        </div>
+        <p class="share-hint" data-i18n="shareHint"></p>
+      </div>
+    </section>
+
     <!-- Settings -->
     <section class="screen modal" id="screen-settings">
       <div class="card">
@@ -199,8 +215,8 @@
     </section>
   </div>
 
-  <script src="js/audio.js?v=20261125f"></script>
-  <script src="js/i18n.js?v=20261125f"></script>
-  <script src="js/game.js?v=20261125f"></script>
+  <script src="js/audio.js?v=20261125g"></script>
+  <script src="js/i18n.js?v=20261125g"></script>
+  <script src="js/game.js?v=20261125g"></script>
 </body>
 </html>

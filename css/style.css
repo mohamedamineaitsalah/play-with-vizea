@@ -264,3 +264,17 @@ a.game-card:hover { border-color: var(--green); transform: translateY(-2px); }
 
 /* Darija : seuls les blocs de texte passent de droite à gauche (la mise en page reste stable) */
 #app.rtl .tag, #app.rtl .card, #app.rtl .over, #app.rtl .menu-btn, #app.rtl .banner, #app.rtl .combo-pop, #app.rtl .streak, #app.rtl .toast, #app.rtl .hint, #app.rtl .hs span, #app.rtl .game-card, #app.rtl .share-card, #app.rtl .panel { direction: rtl; }
+
+/* ===================== v5 : image de partage ===================== */
+.share-btn span { color: inherit; font-size: inherit; }
+.share-btn { box-shadow: 0 6px 20px rgba(252,255,69,.3); transition: transform .2s; }
+.share-btn:active { transform: scale(.95); }
+.share-modal { width: min(460px, 100%); }
+.share-frame { position: relative; margin: 6px 0 12px; border-radius: 18px; overflow: hidden; border: 1px solid var(--line); background: #0b0c0d; aspect-ratio: 4 / 5; max-height: 52vh; display: grid; place-items: center; }
+.share-frame img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.share-loading { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--ff-d); font-size: 40px; color: var(--green); animation: pulse 1s infinite; }
+.share-loading[hidden] { display: none; }
+.btn-link { display: grid; place-items: center; text-decoration: none; color: #fff; }
+.share-hint { margin-top: 12px; font-size: 12.5px; line-height: 1.5; color: var(--muted); text-align: center; }
+#app.rtl .share-hint { font-family: "Cairo", "Space Grotesk", sans-serif; }
+@keyframes pulse { 50% { opacity: .4; } }
