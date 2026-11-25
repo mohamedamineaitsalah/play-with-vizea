@@ -255,9 +255,7 @@
     while (S.milestone < MILESTONES.length && S.score >= MILESTONES[S.milestone]) {
       const m = MILESTONES[S.milestone];
       S.milestone++;
-      // tes sons : 2.mp3 = 1000 points, 3.mp3 = 2000 points, 4.mp3 = 3000 points
-      const snd = { 1000: "2", 2000: "3", 3000: "4" }[m];
-      if (snd) A.playFile("assets/sounds/" + snd + ".mp3", "milestone"); else A.play("milestone");
+      A.play("milestone"); // son intégré du jeu (sons personnalisés retirés)
       buzz([60, 40, 120]);
       if (m === 1000) {
         // 1000 points : effet spécial + changement de musique
@@ -303,9 +301,7 @@
     S.mode = "dying";
     if (reason === "burst" || reason === "hazard") { burst(S.ball.x, S.ball.y, reason === "hazard" ? C.red : C.gold, 40, 1.6); S.ball.state = "gone"; }
     S.shake = 14;
-    // tes sons : 1.mp3 = tué par le Z rouge, 5.mp3 = la balle éclate / perd
-    if (reason === "hazard") A.playFile("assets/sounds/1.mp3", "fail");
-    else A.playFile("assets/sounds/5.mp3", "fail");
+    A.play("fail"); // son intégré du jeu (sons personnalisés retirés)
     A.play("crack");
     buzz(150);
     burst(S.ball.x, S.ball.y, C.red, 26, 1.2);
