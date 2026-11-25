@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@300;500;700&family=Cairo:wght@500;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/style.css?v=20261125b" />
+  <link rel="stylesheet" href="css/style.css?v=20261125f" />
 </head>
 <body>
   <div id="app" class="is-home">
@@ -21,6 +21,11 @@
     <header class="topbar">
       <div class="corner">
         <img src="assets/img/favicon.png" alt="ViZea" class="corner-logo" />
+      </div>
+      <div class="lang-switch" id="lang-switch" role="group" aria-label="Langue / Language / اللغة">
+        <button data-lang="fr" aria-label="Français">FR</button>
+        <button data-lang="en" aria-label="English">EN</button>
+        <button data-lang="ar" class="ar-font" aria-label="الدارجة">دارجة</button>
       </div>
       <div class="controls">
         <button class="icon-btn" id="btn-mute" aria-label="Son" title="Son (M)">
@@ -53,11 +58,22 @@
         <span class="jump-word">JUMP</span>
         <p class="tag" data-i18n-html="tag"></p>
         <button class="btn-play" id="btn-play"><span>PLAY</span><i><svg viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></svg></i></button>
-        <div class="record">🏆 <span data-i18n="record">RECORD</span> <b id="home-best">0</b></div>
-        <div class="home-links">
-          <button class="pill-btn" data-open="games">🎮 <span data-i18n="moreGames"></span></button>
-          <button class="pill-btn" data-open="settings">⚙️ <span data-i18n="settings"></span></button>
-          <button class="pill-btn" data-open="settings" id="lang-pill">🌐 <span id="lang-short">FR</span></button>
+        <div class="home-stats">
+          <div class="hs hs-best"><b id="home-best">0</b><span>🏆 <span data-i18n="recordT"></span></span></div>
+          <div class="hs"><b id="home-level">1</b><span>⭐ <span data-i18n="level"></span></span></div>
+          <div class="hs"><b id="home-played">0</b><span>🎮 <span data-i18n="gamesT"></span></span></div>
+        </div>
+        <div class="home-menu">
+          <button class="menu-btn" data-open="games">
+            <span class="mi">🎮</span>
+            <span class="mt"><b data-i18n="moreGames"></b><small data-i18n="moreGamesSub"></small></span>
+            <span class="ma">›</span>
+          </button>
+          <button class="menu-btn" data-open="settings">
+            <span class="mi">⚙️</span>
+            <span class="mt"><b data-i18n="settings"></b><small data-i18n="settingsSub"></small></span>
+            <span class="ma">›</span>
+          </button>
         </div>
       </div>
     </section>
@@ -183,8 +199,8 @@
     </section>
   </div>
 
-  <script src="js/audio.js?v=20261125b"></script>
-  <script src="js/i18n.js?v=20261125b"></script>
-  <script src="js/game.js?v=20261125b"></script>
+  <script src="js/audio.js?v=20261125f"></script>
+  <script src="js/i18n.js?v=20261125f"></script>
+  <script src="js/game.js?v=20261125f"></script>
 </body>
 </html>

@@ -264,7 +264,7 @@
         banner(t("m1000a"), t("m1000b"));
         Voice.say(t("v1000"));
       } else {
-        banner(t("mPts", { n: fmt(m) }), m >= 5000 ? t("mLegend") : t("mUnstop"));
+        banner(t("mPts", { n: fmt(m) }), m === 2000 ? t("m2000") : m === 3000 ? t("m3000") : t("mLegend"));
         Voice.say(t("vPts", { n: fmt(m) }));
       }
       startFx(true);
@@ -314,7 +314,7 @@
 
   function gameOver() {
     S.mode = "over";
-    app.className = "";
+    app.className = "" + (lang === "ar" ? " rtl" : "");
     stopFx();
     const prevBest = S.startBest;
     const isNew = S.score > prevBest && S.score > 0;
@@ -363,7 +363,7 @@
     closeModals();
     reset();
     S.mode = "play";
-    app.className = "is-play";
+    app.className = "is-play" + (lang === "ar" ? " rtl" : "");
     show(null);
     $("#hint").classList.add("show");
     A.resetTheme();
@@ -372,9 +372,11 @@
   }
   function goHome() {
     stopFx(); closeModals();
-    S.mode = "home"; app.className = "is-home";
+    S.mode = "home"; app.className = "is-home" + (lang === "ar" ? " rtl" : "");
     reset();
     $("#home-best").textContent = fmt(S.best);
+    $("#home-level").textContent = 1 + Math.floor(st.get("vzj_xp", 0) / 500);
+    $("#home-played").textContent = fmt(st.get("vzj_played", 0));
     $("#hint").classList.remove("show");
     show("home");
     A.resetTheme();
@@ -757,15 +759,14 @@
   function applyLang() {
     const L = T();
     document.documentElement.lang = lang === "ar" ? "ar" : lang;
-    document.documentElement.dir = L.dir;
+    document.documentElement.dir = "ltr"; // la mise en page reste fixe ; seuls les textes passent en arabe (voir CSS #app.rtl)
     app.classList.toggle("rtl", lang === "ar");
     $$("[data-i18n]").forEach((el) => { const v = L[el.dataset.i18n]; if (typeof v === "string") el.textContent = v; });
     $$("[data-i18n-html]").forEach((el) => { el.innerHTML = L[el.dataset.i18nHtml]; });
-    $("#lang-short").textContent = L.short;
-    $$("#seg-lang button").forEach((b) => b.classList.toggle("on", b.dataset.lang === lang));
+    $$("#seg-lang button, #lang-switch button").forEach((b) => { b.classList.toggle("on", b.dataset.lang === lang); b.setAttribute("aria-pressed", b.dataset.lang === lang); });
     Voice.load();
   }
-  $$("#seg-lang button").forEach((b) => b.addEventListener("click", () => {
+  $$("#seg-lang button, #lang-switch button").forEach((b) => b.addEventListener("click", () => {
     lang = b.dataset.lang; A.store.set("vzj_lang", lang);
     Voice.name = ""; A.store.set("vzj_voice_name", "");
     applyLang(); A.play("click");
@@ -817,7 +818,13 @@
   }));
   $$("[data-open]").forEach((btn) => btn.addEventListener("click", () => { A.resume(); A.play("click"); openModal(btn.dataset.open); }));
   $$("[data-close]").forEach((btn) => btn.addEventListener("click", () => { A.play("click"); closeModals(); }));
-  window.addEventListener("pointerdown", function once() { A.resume(); A.startMusic(); window.removeEventListener("pointerdown", once); });
+  // le navigateur autorise le son seulement après un premier geste : on démarre au tout premier contact, n'importe où
+  const unlockEvents = ["pointerdown", "touchstart", "keydown", "click"];
+  function unlockSound() {
+    A.resume(); A.startMusic(); syncSettings();
+    unlockEvents.forEach((ev) => window.removeEventListener(ev, unlockSound, true));
+  }
+  unlockEvents.forEach((ev) => window.addEventListener(ev, unlockSound, { capture: true, passive: true }));
 
   if (location.hash === "#debug") window.__vzj = { S, update, render, jump, gameOver, colW: () => colW };
 
@@ -827,6 +834,7 @@
   applyLang();
   syncSettings();
   goHome();
+  try { A.resume(); A.startMusic(); } catch (e) { /* le son démarrera au premier geste */ }
   if (location.hash === "#games") openModal("games");
   requestAnimationFrame(frame);
   if (document.fonts) document.fonts.ready.then(buildBg);

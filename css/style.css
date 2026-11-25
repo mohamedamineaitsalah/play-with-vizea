@@ -218,3 +218,49 @@ a.game-card:hover { border-color: var(--green); transform: translateY(-2px); }
 #app.rtl .share-card, #app.rtl .game-card { text-align: right; }
 .topbar, .hud, .score, .combo, .lives, .seg, .tiles, .over-score, input[type=range] { direction: ltr; }
 .combo-pop.lost { font-size: clamp(18px, 5.6vw, 28px); white-space: normal; width: min(90vw, 400px); text-align: center; line-height: 1.15; }
+
+/* ===================== v4 : langue dans l'en-tête + menu d'accueil ===================== */
+.topbar { gap: 10px; }
+.lang-switch { display: flex; gap: 2px; padding: 3px; border-radius: 999px; background: var(--glass); border: 1px solid var(--line); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); direction: ltr; transition: opacity .3s; }
+.lang-switch button { height: 36px; min-width: 42px; padding: 0 11px; border-radius: 999px; font-family: var(--ff-ui); font-weight: 700; font-size: 12px; letter-spacing: .08em; color: var(--muted); transition: background .25s, color .25s; }
+.lang-switch button.ar-font { font-family: "Cairo", "Space Grotesk", sans-serif; font-size: 13px; letter-spacing: 0; }
+.lang-switch button:hover:not(.on) { color: #fff; }
+.lang-switch button.on { background: var(--green); color: var(--ink); box-shadow: 0 0 14px rgba(30,215,96,.45); }
+.lang-switch button:focus-visible, .menu-btn:focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
+#app.is-play .lang-switch { opacity: 0; pointer-events: none; }
+
+.home { gap: 12px; width: 100%; }
+.home-logo { width: min(400px, 76vw); }
+.jump-word { font-size: clamp(40px, 12vw, 80px); }
+.home-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: min(400px, 100%); margin-top: 2px; direction: ltr; }
+.hs { padding: 10px 6px; border-radius: 16px; background: rgba(255,255,255,.04); border: 1px solid var(--line); text-align: center; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.hs b { display: block; font-family: "Space Grotesk", sans-serif; font-weight: 500; font-size: 22px; line-height: 1.2; color: #fff; font-variant-numeric: tabular-nums; }
+.hs-best { border-color: rgba(252,255,69,.4); background: rgba(252,255,69,.07); }
+.hs-best b { color: var(--yellow); }
+.hs span { font-family: var(--ff-ui); font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: .04em; }
+#app.rtl .hs span { font-family: "Cairo", "Space Grotesk", sans-serif; }
+.home-menu { display: grid; gap: 8px; width: min(400px, 100%); }
+.menu-btn { display: flex; align-items: center; gap: 12px; width: 100%; padding: 11px 14px; border-radius: 18px; background: linear-gradient(160deg, rgba(34,36,38,.92), rgba(16,17,18,.94)); border: 1px solid var(--line); text-align: left; transition: border-color .25s, transform .2s; }
+.menu-btn:hover { border-color: var(--green); transform: translateY(-1px); }
+.menu-btn:active { transform: scale(.98); }
+.mi { flex: none; width: 42px; height: 42px; border-radius: 13px; display: grid; place-items: center; background: var(--ink); border: 1px solid rgba(30,215,96,.45); font-size: 18px; }
+.mt { flex: 1; min-width: 0; }
+.mt b { display: block; font-family: var(--ff-ui); font-size: 15px; color: #fff; }
+.mt small { display: block; font-size: 12px; color: var(--muted); line-height: 1.35; }
+.ma { flex: none; font-size: 26px; line-height: 1; color: var(--green); }
+#app.rtl .menu-btn { text-align: right; }
+#app.rtl .menu-btn .mt b, #app.rtl .menu-btn .mt small { font-family: "Cairo", "Space Grotesk", sans-serif; }
+#app.rtl .ma { transform: scaleX(-1); }
+@media (max-height: 760px) {
+  .home { gap: 8px; }
+  .home-logo { width: min(320px, 62vw); }
+  .tag { font-size: 13.5px; }
+  .btn-play { height: 64px; font-size: 26px; }
+  .btn-play i { width: 48px; height: 48px; }
+}
+@media (max-width: 360px) {
+  .lang-switch button { min-width: 36px; padding: 0 8px; }
+}
+
+/* Darija : seuls les blocs de texte passent de droite à gauche (la mise en page reste stable) */
+#app.rtl .tag, #app.rtl .card, #app.rtl .over, #app.rtl .menu-btn, #app.rtl .banner, #app.rtl .combo-pop, #app.rtl .streak, #app.rtl .toast, #app.rtl .hint, #app.rtl .hs span, #app.rtl .game-card, #app.rtl .share-card, #app.rtl .panel { direction: rtl; }

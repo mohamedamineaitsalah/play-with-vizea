@@ -23,7 +23,8 @@
   const mtof = (m) => 440 * Math.pow(2, (m - 69) / 12);
 
   let ctx = null, master, musicBus, sfxBus, comp, noiseBuf, delay, delayFb, delayWet;
-  let musicOn = store.get("vzj_music", true), sfxOn = store.get("vzj_sfx", true);
+  // musique et effets toujours activés à l'ouverture du jeu (le bouton coupe seulement pour la partie en cours)
+  let musicOn = true, sfxOn = true;
   let musicVol = store.get("vzj_mvol", 0.7), sfxVol = store.get("vzj_svol", 0.8);
   let baseTheme = store.get("vzj_theme", "pulse");
   if (!THEMES[baseTheme] || baseTheme === "viral") baseTheme = "pulse";
