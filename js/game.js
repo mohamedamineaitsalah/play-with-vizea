@@ -10,7 +10,7 @@
   const FONT = '"Dexperdy", "Space Grotesk", system-ui, sans-serif';
   const MAX_COMBO = 8;
   const MILESTONES = [1000, 2000, 3000, 5000, 10000];
-  const RANK_MIN = [0, 200, 500, 1000, 2000, 3500];
+  const RANK_MIN = [0, 500, 1500, 3000, 5000]; // 5000+ = légende
   const MAX_LIVES = 1;
   const L10N = window.VZI18N;
   let lang = A.store.get("vzj_lang", null);
@@ -869,14 +869,12 @@
       g.font = `700 28px ${TXT}`; g.fillStyle = "rgba(255,255,255,0.62)"; g.fillText(l, x + tw / 2, ty + 132);
       g.direction = "ltr";
     });
-    // défi + lien
-    const by = Math.min(Hc - 160, ty + th + 80);
+    // défi + hashtag (sans le lien GitHub)
+    const by = Math.min(Hc - 150, ty + th + 90);
     g.direction = ar ? "rtl" : "ltr";
-    g.font = `800 50px ${TXT}`; g.fillStyle = C.green; g.fillText(t("imgBeat"), Wc / 2, by);
+    g.font = `800 54px ${TXT}`; g.fillStyle = C.green; g.fillText(t("imgBeat"), Wc / 2, by);
     g.direction = "ltr";
-    g.font = '500 28px "Space Grotesk", sans-serif'; g.fillStyle = "rgba(255,255,255,0.7)";
-    g.fillText(GAME_URL.replace("https://", "").replace(/\/$/, ""), Wc / 2, by + 60);
-    g.font = '700 28px "Space Grotesk", sans-serif'; g.fillStyle = C.yellow; g.fillText("#PlayWithViZea", Wc / 2, by + 104);
+    g.font = '700 32px "Space Grotesk", sans-serif'; g.fillStyle = C.yellow; g.fillText("#PlayWithViZea", Wc / 2, by + 70);
     return new Promise((res) => c.toBlob((b) => res(b), "image/png"));
   }
 
